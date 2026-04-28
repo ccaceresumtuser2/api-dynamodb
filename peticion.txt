@@ -1,0 +1,7 @@
+{
+    "cod_hoj_vida": "HV-001",
+    "documento": "1234567890",
+    "fecha": "2026-04-27",
+    "nombre_apellido": "Juan Pérez",
+    "key_s3": "path/to/s3/file"
+}
