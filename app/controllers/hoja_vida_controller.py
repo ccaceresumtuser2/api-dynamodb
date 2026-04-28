@@ -4,6 +4,7 @@ from app.services.hoja_vida_services import (
     insertar_hoja_vida_service,
     obtener_hoja_vida_service,
     obtener_hojas_vida_por_documento_service,
+    obtener_hojas_vida_por_rango_fecha_service,
     obtener_hojas_vida_por_cod_hoja_service,
     generar_datos_ejemplo_service
 )
@@ -71,6 +72,25 @@ async def obtener_hojas_vida_por_documento(documento: str):
             return resultado
         else:
             raise HTTPException(status_code=404, detail=resultado["message"])
+
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error interno: {str(e)}")
+
+
+@router.get("/hoja-vida/fecha")
+async def obtener_hojas_vida_por_fecha(fecha_inicio: str, fecha_fin: str):
+    """
+    Obtiene hojas de vida dentro de un rango de fechas.
+    """
+    try:
+        resultado = obtener_hojas_vida_por_rango_fecha_service(fecha_inicio, fecha_fin)
+
+        if resultado["success"]:
+            return resultado
+        else:
+            raise HTTPException(status_code=400, detail=resultado["message"])
 
     except HTTPException:
         raise

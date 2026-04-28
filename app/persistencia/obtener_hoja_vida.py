@@ -1,4 +1,6 @@
 import boto3
+from datetime import datetime
+from boto3.dynamodb.conditions import Attr
 from app.config.conexion_aws import conexion_aws_boto3
 
 dynamodb = conexion_aws_boto3()
@@ -111,6 +113,64 @@ def obtener_hojas_vida_por_documento(documento):
         return {
             "success": False,
             "message": f"Error al obtener hojas de vida por documento: {str(e)}"
+        }
+
+
+def obtener_hojas_vida_por_rango_fecha(fecha_inicio, fecha_fin):
+    """
+    Obtiene registros de hoja de vida dentro de un rango de fechas.
+
+    Args:
+        fecha_inicio: Fecha inicial (inclusive) en formato ISO 8601, por ejemplo '2026-04-01'
+        fecha_fin: Fecha final (inclusive) en formato ISO 8601, por ejemplo '2026-04-30'
+
+    Returns:
+        dict: {"success": True/False, "message": str, "data": items, "count": int}
+    """
+    try:
+        try:
+            fecha_inicio_dt = datetime.fromisoformat(fecha_inicio)
+            fecha_fin_dt = datetime.fromisoformat(fecha_fin)
+        except ValueError:
+            return {
+                "success": False,
+                "message": "Formato de fecha inválido. Use ISO 8601, por ejemplo '2026-04-01' o '2026-04-01T00:00:00'"
+            }
+
+        if fecha_inicio_dt > fecha_fin_dt:
+            return {
+                "success": False,
+                "message": "La fecha de inicio no puede ser mayor que la fecha de fin"
+            }
+
+        table = dynamodb.Table('HojasVida')
+        scan_kwargs = {
+            'FilterExpression': Attr('fecha').between(fecha_inicio, fecha_fin)
+        }
+
+        items = []
+        response = table.scan(**scan_kwargs)
+        items.extend(response.get('Items', []))
+
+        while 'LastEvaluatedKey' in response:
+            response = table.scan(
+                ExclusiveStartKey=response['LastEvaluatedKey'],
+                **scan_kwargs
+            )
+            items.extend(response.get('Items', []))
+
+        print(f"✅ Se encontraron {len(items)} registros entre {fecha_inicio} y {fecha_fin}")
+        return {
+            "success": True,
+            "message": f"Se encontraron {len(items)} registros entre {fecha_inicio} y {fecha_fin}",
+            "data": items,
+            "count": len(items)
+        }
+    except Exception as e:
+        print(f"❌ Error al obtener hojas de vida por rango de fecha: {str(e)}")
+        return {
+            "success": False,
+            "message": f"Error al obtener hojas de vida por rango de fecha: {str(e)}"
         }
 
 

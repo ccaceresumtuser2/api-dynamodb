@@ -4,6 +4,7 @@ from app.persistencia.obtener_hoja_vida import (
     obtener_hoja_vida as obtener_por_clave,
     obtener_todas_hojas_vida as obtener_todos,
     obtener_hojas_vida_por_documento as obtener_por_doc,
+    obtener_hojas_vida_por_rango_fecha as obtener_por_fecha,
     obtener_hojas_vida_por_cod_hoja as obtener_por_cod
 )
 from app.persistencia.generar_datos_ejemplo import generar_datos_ejemplo as generar_datos
@@ -39,6 +40,13 @@ def obtener_hojas_vida_por_documento_service(documento):
     Servicio para obtener hojas de vida por número de documento
     """
     return obtener_por_doc(documento)
+
+
+def obtener_hojas_vida_por_rango_fecha_service(fecha_inicio, fecha_fin):
+    """
+    Servicio para obtener hojas de vida dentro de un rango de fechas
+    """
+    return obtener_por_fecha(fecha_inicio, fecha_fin)
 
 
 def obtener_hojas_vida_por_cod_hoja_service(cod_hoj_vida, limite=10, page=1):

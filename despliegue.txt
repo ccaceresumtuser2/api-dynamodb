@@ -1,0 +1,11 @@
+pip install -r requirements.txt
+
+python -m uvicorn main:app --reload
+http://127.0.0.1:8000/docs
+
+
+matar el puerto 8000
+netstat -ano | findstr :8000
+taskkill /PID 5536 /F
+matar el proceso
+taskkill /IM python.exe /F
